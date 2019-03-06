@@ -1,8 +1,21 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { devicePropType } from '../constants';
+import { getGroups } from '../api/groupApi';
 
 export default class DeviceForm extends PureComponent {
+    state = {
+        groups: [],
+        selectedGroupId: ''
+    };
+
+    componentDidMount = async () => {
+        this.setState({
+            groups: await getGroups(),
+            selectedGroupId: this.props.device.groupId
+        });
+    };
+
     handleCancelClick = () => {
         window.history.back();
     };
@@ -12,14 +25,20 @@ export default class DeviceForm extends PureComponent {
             ...this.props.device,
             name: event.target.deviceName.value,
             address: event.target.deviceAddress.value,
-            port: parseInt(event.target.devicePort.value, 10)
+            port: parseInt(event.target.devicePort.value, 10),
+            groupId: event.target.deviceGroup.value
         });
 
         event.preventDefault();
     };
 
+    handleGroupChange = (event) => {
+        this.setState({selectedGroupId: event.target.value});
+    }
+
     render() {
         const {device} = this.props;
+        const {groups, selectedGroupId} = this.state;
 
         return (
             <form onSubmit={this.handleSubmit}>
@@ -54,6 +73,19 @@ export default class DeviceForm extends PureComponent {
                            placeholder="Port"
                            required
                            defaultValue={device.port}/>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="deviceGroup">Group</label>
+                    <select className="form-control"
+                            id="deviceGroup"
+                            value={selectedGroupId}
+                            onChange={this.handleGroupChange}>
+                        <option value="">No group</option>
+                        {groups.map(group =>
+                            <option key={group.id} value={group.id}>{group.name}</option>
+                        )}
+                    </select>
                 </div>
 
                 <div className="float-right">

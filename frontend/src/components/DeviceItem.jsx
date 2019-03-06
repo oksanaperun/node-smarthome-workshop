@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { removeDevice, switchOn, switchOff } from '../api';
+import { removeDevice, switchOn, switchOff } from '../api/devicesApi';
 import { devicePropType } from '../constants';
 
 export default class DeviceItem extends PureComponent {
@@ -13,9 +13,9 @@ export default class DeviceItem extends PureComponent {
 
     handleStateChange = async (e) => {
         const {device, onUpdate} = this.props;
-        const newState = e.target.value;
+        const newState = e.target.firstChild.id;
 
-        if (newState === 'on') {
+        if (newState === 'On') {
             await switchOn(device.id);
         } else {
             await switchOff(device.id);
@@ -34,24 +34,20 @@ export default class DeviceItem extends PureComponent {
                 <td>{device.address}:{device.port}</td>
                 <td className="text-right">
                     <div className="btn-group btn-group-toggle mr-2" role="group" data-toggle="buttons">
-                        <label className={`btn btn-outline-primary ${device.state === 'on' ? 'active' : ''}`}>
+                        <label className={`btn btn-outline-primary ${device.state === 'On' ? 'active' : ''}`}
+                               onClick={this.handleStateChange}>
                             <input type="radio"
                                    name="state"
-                                   id="on"
-                                   autoComplete="off"
-                                   onChange={this.handleStateChange}
-                                   value="on"
-                                   checked={device.state === 'on'}/> On
+                                   id="On"
+                                   defaultChecked={device.state === 'On'}/> On
                         </label>
 
-                        <label className={`btn btn-outline-primary ${device.state === 'off' ? 'active' : ''}`}>
+                        <label className={`btn btn-outline-primary ${device.state === 'Off' ? 'active' : ''}`}
+                               onClick={this.handleStateChange}>
                             <input type="radio"
                                    name="state"
-                                   id="off"
-                                   autoComplete="off"
-                                   onChange={this.handleStateChange}
-                                   value="off"
-                                   checked={device.state === 'off'}/> Off
+                                   id="Off"
+                                   defaultChecked={device.state === 'Off'}/> Off
                         </label>
                     </div>
 
